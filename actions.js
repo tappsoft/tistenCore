@@ -1,5 +1,6 @@
 const { Artist, Album, NeteaseSong, sleep } = require("./classes");
 const netease_crypto = require("./netease-crypto");
+const fs = require("fs")
 const requests = require("./requests");
 async function search_music(type, keywords, limit = 30, offset = 0) {
     switch (type) {
@@ -22,8 +23,9 @@ async function search_music(type, keywords, limit = 30, offset = 0) {
     }
 }
 // search_music("netease", "never gonna give you up").then(async(value) => {
-//     await sleep(1000);
-//     value.forEach(async(e) => {
-//         console.log(await e.getLyric())
-//     })
+//     let e = value[0];
+//     await e.waitForOk();
+//     // fs.writeFileSync("a.json", JSON.stringify(e.lyrics));
+//     console.log(e.name(), e.id(), await e.get_music_url());
+//     console.log(e.artists(), e.album(), e.author_name());
 // })
