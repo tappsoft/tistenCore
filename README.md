@@ -2,14 +2,14 @@
 JavaScript 各渠道音乐库
 
 ## TODO
-[X] Netease
-    [X] search
-    [X] info
-    [X] music url
-    [X] lyrics & translate
-[ ] Kugou
-[ ] QQ
-[ ] Kuwo
+- [X] Netease
+    - [X] search
+    - [X] info
+    - [X] music url
+    - [X] lyrics & translate
+- [ ] Kugou
+- [ ] QQ
+- [ ] Kuwo
 
 ## Example
 
