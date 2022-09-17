@@ -110,10 +110,61 @@ class NeteaseSong extends Song {
         return req.data['data'][0]['url']
     };
 }
+class KugouSong extends Song {
+    constructor(data) {
+        super()
+        this.source = "kugou";
+        this.data = data;
+        this.fulldata = {};
+        this.ok = false;
+        this._setup();
+    }
+    waitForOk() {
+        return new Promise((resolve, reject) => {
+            let i = setInterval(() => {
+                if (this.ok) {
+                    clearInterval(i);
+                    resolve();
+                }
+            }, 1)
+        })
+    }
+    hello(content) {
+        this.fulldata = content.data;
+    }
+    async _setup() {
+        let HASH = this.data["hash"]
+        let ID = this.data["album_audio_id"]
+        let req = await requests.get(
+            `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&hash=${HASH}&appid=1014&album_audio_id=${ID}`
+        );
+        eval(req.data);
+        this.ok = true;
+    }
+    id() { return this.data["album_audio_id"]; }
+    name() { return this.data["songname"]; }
+    artists() {
+        let l = [];
+        for (let i in this.fulldata["authors"]) {
+            let ar = this.fulldata["authors"][i];
+            l.push(new Artist(parseInt(ar.author_id), ar.author_name, "", "kugou"));
+        }
+        return l;
+    }
+    author_name() {
+        return this.fulldata["author_name"];
+    }
+    alias() { return "" }
+    album() { return new Album(parseInt(this.data["album_id"]), this.data["album_name"], "kugou") };
+    async get_music_url(quality = 0) {
+        return this.fulldata["play_url"]
+    };
+}
 module.exports = {
     Artist,
     Album,
     Song,
     NeteaseSong,
+    KugouSong,
     sleep
 }

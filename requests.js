@@ -4,13 +4,10 @@ var http = require("http"),
     https = require("https");
 const DEFAULT_HEADERS_POST = {
     "cookie": "kg_mid=d786e361b41cea1eefa6568756d295aa; kg_dfid=0R7sJM4cyxDG1YBWwZ2xLKjY; kg_dfid_collect=d41d8cd98f00b204e9800998ecf8427e; Hm_lvt_aedee6983d4cfc62f509129360d6bb3d=1662701526,1662704266",
-    //"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36",
-    //"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
     "content-type": "application/x-www-form-urlencoded",
     'Accept-Encoding': 'gzip, deflate',
     'Accept': '*/*',
     'Connection': 'keep-alive',
-    //"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 };
 const DEFAULT_HEADERS_GET = {
     "cookie": "kg_mid=d786e361b41cea1eefa6568756d295aa; kg_dfid=0R7sJM4cyxDG1YBWwZ2xLKjY; kg_dfid_collect=d41d8cd98f00b204e9800998ecf8427e; Hm_lvt_aedee6983d4cfc62f509129360d6bb3d=1662701526,1662704266",
@@ -43,7 +40,8 @@ const chooseUserAgent = (ua = false) => {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.30 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/13.10586',
-            // Linux 就算了
+            // Linux 
+            "Mozilla/5.0 (Linux; U; Android 8.1.0; en-US; Nexus 6P Build/OPM7.181205.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.108 UCBrowser/12.11.1.1197 Mobile Safari/537.36",
         ],
     }
     let realUserAgentList =
@@ -53,7 +51,12 @@ const chooseUserAgent = (ua = false) => {
         ua
 }
 
-function get(url) {
+function get(url, data = {}) {
+    let header = Object.assign({}, DEFAULT_HEADERS_POST);
+    if (url.includes('music.163.com'))
+        header['Referer'] = 'https://music.163.com'
+    header["User-Agent"] = chooseUserAgent("pc");
+    data.csrf_token = "";
     return new Promise((resolve, reject) => {
         axios({
             url: url,
@@ -87,9 +90,6 @@ function post(url, data = {}) {
     })
 }
 module.exports = {
-        get,
-        post
-    }
-    // get("http://www.baidu.com").then((res) => {
-    //     console.log(res.data)
-    // })
+    get,
+    post
+}

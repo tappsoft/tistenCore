@@ -46,3 +46,4 @@ search_music("netease", "never gonna give you up").then(async(value) => {
     //...
 ]
 ```
+### `KugouSong` 类
