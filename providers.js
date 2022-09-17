@@ -1,6 +1,6 @@
 const requests = require("./requests");
-const netease_crypto = require("./netease-crypto");
-const netease_lyric_parser = require("./netease-lyric-parser");
+const netease_crypto = require("./utils/netease/crypto");
+const netease_lyric_parser = require("./utils/netease/lyric-parser");
 const sleep = time => {
     return new Promise(resolve => setTimeout(resolve, time))
 };

@@ -1,5 +1,5 @@
-const { Artist, Album, NeteaseSong, sleep } = require("./classes");
-const netease_crypto = require("./netease-crypto");
+const { Artist, Album, NeteaseSong, sleep } = require("./providers");
+const netease_crypto = require("./utils/netease/crypto");
 const fs = require("fs")
 const requests = require("./requests");
 async function search_music(type, keywords, limit = 30, offset = 0) {
