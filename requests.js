@@ -2,6 +2,9 @@ const { default: axios } = require('axios');
 const qs = require("qs");
 var http = require("http"),
     https = require("https");
+const sleep = time => {
+    return new Promise(resolve => setTimeout(resolve, time))
+};
 const DEFAULT_HEADERS_POST = {
     "cookie": "kg_mid=d786e361b41cea1eefa6568756d295aa; kg_dfid=0R7sJM4cyxDG1YBWwZ2xLKjY; kg_dfid_collect=d41d8cd98f00b204e9800998ecf8427e; Hm_lvt_aedee6983d4cfc62f509129360d6bb3d=1662701526,1662704266",
     "content-type": "application/x-www-form-urlencoded",
@@ -49,7 +52,17 @@ const chooseUserAgent = (ua = false) => {
     return ['mobile', 'pc', false].indexOf(ua) > -1 ?
         realUserAgentList[Math.floor(Math.random() * realUserAgentList.length)] :
         ua
-}
+};
+// axios.interceptors.request.use(async config => {
+//     curReq++;
+//     if (curReq >= sleepReq + Math.random() * 3) {
+//         curReq = 0;
+//         await sleep(sleepReqMs + 10 * Math.random());
+//     }
+//     return config;
+// }, async err => {
+
+// });
 
 function get(url, data = {}) {
     let header = Object.assign({}, DEFAULT_HEADERS_POST);
@@ -79,17 +92,15 @@ function post(url, data = {}) {
     return new Promise((resolve, reject) => {
         axios.post(url, new URLSearchParams(data).toString(), {
             headers: header,
-            httpAgent: new http.Agent({ keepAlive: true }),
-            httpsAgent: new https.Agent({ keepAlive: true }),
         }).then((value) => {
             resolve(value);
         }).catch((value) => {
             console.error(value);
-            reject(value);
         })
     })
 }
 module.exports = {
     get,
-    post
+    post,
+    sleep
 }

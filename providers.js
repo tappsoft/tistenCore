@@ -1,9 +1,7 @@
 const requests = require("./requests");
+const { sleep } = require("./requests")
 const netease_crypto = require("./utils/netease/crypto");
-const netease_lyric_parser = require("./utils/netease/lyric-parser");
-const sleep = time => {
-    return new Promise(resolve => setTimeout(resolve, time))
-};
+const lyric_parser = require("./utils/lyric-parser");
 class Artist {
     constructor(id, name, alias, source) {
         Object.assign(this, {
@@ -31,6 +29,7 @@ class Song {
 class NeteaseSong extends Song {
     constructor(data) {
         super()
+        this.canUse = true;
         this.source = "netease";
         this.data = data;
         this.fulldata = {};
@@ -56,6 +55,7 @@ class NeteaseSong extends Song {
             })
         )
         this.fulldata = req.data['songs'][0];
+        this.time = this.data.duration;
         let req_lyric = await requests.post(
             "https://music.163.com/weapi/song/lyric",
             netease_crypto.weapi({
@@ -75,7 +75,7 @@ class NeteaseSong extends Song {
         if (req_lyric.data.tlyric) {
             tlyric = (req_lyric.data)["tlyric"]["lyric"].replace(/(|\\)/g, '').replace(/[\u2005]+/g, ' ');
         }
-        this.lyrics = netease_lyric_parser.parseLyric(lyric, tlyric);
+        this.lyrics = lyric_parser.parseLyric(lyric, tlyric);
         this.ok = true;
     }
     id() { return this.data.id; }
@@ -113,6 +113,7 @@ class NeteaseSong extends Song {
 class KugouSong extends Song {
     constructor(data) {
         super()
+        this.canUse = true;
         this.source = "kugou";
         this.data = data;
         this.fulldata = {};
@@ -130,15 +131,26 @@ class KugouSong extends Song {
         })
     }
     hello(content) {
+        if (content["err_code"]) return;
         this.fulldata = content.data;
     }
     async _setup() {
         let HASH = this.data["hash"]
-        let ID = this.data["album_audio_id"]
+        let ID = this.data["album_audio_id"];
+        let t = 0;
+        const timstamp = +new Date();
         let req = await requests.get(
-            `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&hash=${HASH}&appid=1014&album_audio_id=${ID}`
+            `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&platid=4&album_id=${ID}&_=${timstamp}`
+            //`https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&appid=1014&album_audio_id=${ID}&_=${timstamp}`
         );
         eval(req.data);
+        if (Object.keys(this.fulldata).length <= 3) {
+            this.lyrics = {};
+            this.canUse = false;
+        } else {
+            this.time = this.fulldata.timelength;
+            this.lyrics = lyric_parser.parseLyric(this.fulldata["lyrics"], "");
+        }
         this.ok = true;
     }
     id() { return this.data["album_audio_id"]; }
