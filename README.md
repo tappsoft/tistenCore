@@ -14,6 +14,9 @@ JavaScript 各渠道音乐库
     - [X] lyrics & translate
 - [ ] QQ
 - [ ] Kuwo
+- [ ] Migu
+- [ ] Bilibili
+- [ ] :smile:... (planning)
 
 ## Example
 
