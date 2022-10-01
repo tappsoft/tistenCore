@@ -1,6 +1,5 @@
 const { Artist, Album, NeteaseSong, KugouSong, sleep } = require("./providers");
 const netease_crypto = require("./utils/netease/crypto");
-const fs = require("fs")
 const requests = require("./requests");
 async function search_music(type, keywords, limit = 30, offset = 0) {
     let req, res, l;
@@ -31,10 +30,6 @@ async function search_music(type, keywords, limit = 30, offset = 0) {
             console.error("no such type", type);
     }
 }
-// search_music("kugou", "never gonna give you up").then(async(value) => {
-//     let e = value[0];
-//     await e.waitForOk();
-//     fs.writeFileSync("a.json", JSON.stringify(e.lyrics));
-//     console.log(e.name(), e.id(), await e.get_music_url());
-//     console.log(e.artists(), e.album(), e.author_name());
-// })
+module.exports = {
+    search_music
+}

@@ -11,6 +11,14 @@ class Artist {
             source: source
         });
     }
+    source_url() {
+        switch (this.source) {
+            case "netease":
+                return `https://music.163.com/#/artist?id=${this.id}`
+            case "kugou":
+                return `https://www.kugou.com/singer/${this.id}.html`
+        }
+    }
 }
 class Album {
     constructor(id, name, source) {
@@ -20,16 +28,32 @@ class Album {
             source: source
         });
     }
+    source_url() {
+        switch (this.source) {
+            case "netease":
+                return `https://music.163.com/#/album?id=${this.id}`
+            case "kugou":
+                return `https://www.kugou.com/yy/album/single/${this.id}.html`
+        }
+    }
 }
 class Song {
     constructor(data) {
         this.data = data;
     }
+    source_url() {
+        switch (this.source) {
+            case "netease":
+                return `https://music.163.com/#/song?id=${this.id()}`
+            case "kugou":
+                return `https://www.kugou.com/song/#hash=${this.data["hash"]}&album_audio_id=${this.id()}`
+        }
+    }
 }
 class NeteaseSong extends Song {
     constructor(data) {
         super()
-        this.canUse = true;
+        this.money = data.fee == 1;
         this.source = "netease";
         this.data = data;
         this.fulldata = {};
@@ -100,20 +124,21 @@ class NeteaseSong extends Song {
     album() { return new Album(this.data.album.id, this.data.album.name, "netease") };
     async get_music_url(quality = 0) {
         let rate_map = { 0: 320000, 1: 192000, 2: 128000 }
+        if (quality == 2) return `http://music.163.com/song/media/outer/url?id=${this.id()}.mp3`
         let req = await requests.post(
-            "https://music.163.com/weapi/song/enhance/player/url",
-            netease_crypto.weapi({
+            "https://interface3.music.163.com/eapi/song/enhance/player/url",
+            netease_crypto.eapi('/api/song/enhance/player/url', {
                 "ids": JSON.stringify([this.id()]),
                 "br": rate_map[quality],
             })
-        )
+        );
         return req.data['data'][0]['url']
     };
 }
 class KugouSong extends Song {
     constructor(data) {
         super()
-        this.canUse = true;
+        this.money = true;
         this.source = "kugou";
         this.data = data;
         this.fulldata = {};
@@ -140,13 +165,16 @@ class KugouSong extends Song {
         let t = 0;
         const timstamp = +new Date();
         let req = await requests.get(
-            `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&platid=4&album_id=${ID}&_=${timstamp}`
-            //`https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&appid=1014&album_audio_id=${ID}&_=${timstamp}`
+            (
+                Math.random() <= 0.5 ?
+                `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&platid=4&album_id=${ID}&_=${timstamp}` :
+                `https://wwwapi.kugou.com/yy/index.php?r=play/getdata&callback=this.hello&mid=1&hash=${HASH}&appid=1014&album_audio_id=${ID}&_=${timstamp}`
+            )
         );
         eval(req.data);
         if (Object.keys(this.fulldata).length <= 3) {
             this.lyrics = {};
-            this.canUse = false;
+            this.money = false;
         } else {
             this.time = this.fulldata.timelength;
             this.lyrics = lyric_parser.parseLyric(this.fulldata["lyrics"], "");
@@ -169,7 +197,7 @@ class KugouSong extends Song {
     alias() { return "" }
     album() { return new Album(parseInt(this.data["album_id"]), this.data["album_name"], "kugou") };
     async get_music_url(quality = 0) {
-        return this.fulldata["play_url"]
+        return this.fulldata["play_url"] || this.fulldata["play_backup_url"]
     };
 }
 module.exports = {

@@ -1,17 +1,15 @@
 # tistenCore
 JavaScript 各渠道音乐库
 
+## Features
+- [X] search
+- [X] info
+- [X] music url
+- [X] lyrics & translate
+
 ## TODO
 - [X] Netease
-    - [X] search
-    - [X] info
-    - [X] music url
-    - [X] lyrics & translate
 - [X] Kugou
-    - [X] search
-    - [X] info
-    - [X] music url
-    - [X] lyrics & translate
 - [ ] QQ
 - [ ] Kuwo
 - [ ] Migu
@@ -34,14 +32,17 @@ search_music("netease", "never gonna give you up").then(async(value) => {
 > - NeteaseSong
 > - KugouSong
 #### 方法
-- `await e.waitForOk()` 等待加载就绪
+- `await e.waitForOk()` 等待加载就绪，读取前必须使用
+- `await get_music_url()` 获取播放url
 - `id()`->`Number` 获取ID 
 - `name()`->`String` 获取歌名 
-- `await get_music_url()` 获取url
 - `artists()`->`Artist[]` 获取艺术家列表 
 - `album()`->`Album` 获取专辑 
 - `author_name()`->`String` 所有艺术家的名字连在一起
+- `source_url()`->`String` 详情页url
 #### 属性
+- `source`: `String` 来源
+- `money`:`Boolean` 是否收费
 - `lyrics`:`{content:xxx,seconds:xxx,...}[]` 歌词解析后内容（包括翻译）
 ```json
 [
@@ -66,11 +67,14 @@ search_music("netease", "never gonna give you up").then(async(value) => {
     - `netease`
     - `kugou`
     ...后续添加...
+#### 方法
+- `source_url()`->`String` 详情页url
 
 ### `Album` 类 （专辑类）
 - `id`:`Number` 该专辑在它平台上的编号
 - `name`:`String` 专辑名
 - `source`:`String` 来源，同`Artist`类的`source`
-
+#### 方法
+- `source_url()`->`String` 详情页url
 ---
 若侵犯了您的权利，请提issue
