@@ -17,11 +17,12 @@ JavaScript 各渠道音乐库
 - [ ] :smile:... (planning)
 
 ## Example
-
+[👉更多示例](https://github.com/tappsoft/tistenCore/tree/main/examples)
 ```javascript
 search_music("netease", "never gonna give you up").then(async(value) => {
     let e = value[0];
     await e.waitForOk();
+    // 名称，id，音乐url，作者，专辑，作者格式化后的字符串
     console.log(e.name(), e.id(), await e.get_music_url());
     console.log(e.artists(), e.album(), e.author_name());
 })
